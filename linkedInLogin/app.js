@@ -13,7 +13,6 @@ require('dotenv').load();
 var port = process.env.PORT || 3000;
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
 var auth = require('./routes/auth');
 
 var app = express();
@@ -36,9 +35,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
-
 passport.serializeUser(function(user, done) {
   //later this will be where you selectively store an identifier for your user, like their primary key from the database
   done(null, user);
@@ -50,12 +46,12 @@ passport.deserializeUser(function(obj, done) {
 });
 
 passport.use(new LinkedInStrategy({
-    consumerKey: process.env['75deas2dl8u1a8'],
-    consumerSecret: process.env['L65i0oHiiyzpJJql'],
+    consumerKey: process.env['CLIENT_KEY'],
+    consumerSecret: process.env['LINKEDIN_KEY'],
     callbackURL: "http://localhost:3000/auth/linkedin/callback",
     scope: ['r_emailaddress', 'r_basicprofile'],
   },
-  
+
   function(token, tokenSecret, profile, done) {
 
       // To keep the example simple, the user's LinkedIn profile is returned to
@@ -65,7 +61,9 @@ passport.use(new LinkedInStrategy({
       return done(null, profile);
 }));
 
+
 //mount auth.js middleware
+app.use('/', routes);
 app.use('/auth', auth);
 
 // catch 404 and forward to error handler
