@@ -1,0 +1,36 @@
+{
+  "name": "linkedinlogin",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "~1.13.2",
+    "cookie-parser": "~1.3.5",
+    "debug": "~2.2.0",
+    "dotenv": "^1.2.0",
+    "ejs": "~2.3.3",
+    "express": "~4.13.1",
+    "knex": "^0.9.0",
+    "locus": "^1.2.0",
+    "method-override": "^2.3.5",
+    "morgan": "~1.6.1",
+    "passport": "^0.3.2",
+    "passport-linkedin": "^1.0.0",
+    "pg": "^4.4.3",
+    "serve-favicon": "~2.3.0"
+  },
+  "description": "Oauthentication practice ",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ariflo/express-passport-linkedin.git"
+  },
+  "author": "Ari",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ariflo/express-passport-linkedin/issues"
+  },
+  "homepage": "https://github.com/Ariflo/express-passport-linkedin#readme"
+}
