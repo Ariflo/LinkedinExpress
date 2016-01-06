@@ -4,9 +4,17 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var passport = require('passport');
+var cookieSession = require('cookie-session');
+var LinkedInStrategy = require('passport-linkedin').Strategy;
+
+require('dotenv').load();
+
+var port = process.env.PORT || 3000;
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var auth = require('./routes/auth');
 
 var app = express();
 
@@ -20,10 +28,45 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: [process.env['SECRET_KEY']]
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
+
+passport.serializeUser(function(user, done) {
+  //later this will be where you selectively store an identifier for your user, like their primary key from the database
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  //here is where you will go to the database and get the user each time from it's id, after you set up your db
+  done(null, obj);
+});
+
+passport.use(new LinkedInStrategy({
+    consumerKey: process.env['75deas2dl8u1a8'],
+    consumerSecret: process.env['L65i0oHiiyzpJJql'],
+    callbackURL: "http://localhost:3000/auth/linkedin/callback",
+    scope: ['r_emailaddress', 'r_basicprofile'],
+  },
+  
+  function(token, tokenSecret, profile, done) {
+
+      // To keep the example simple, the user's LinkedIn profile is returned to
+      // represent the logged-in user.  In a typical application, you would want
+      // to associate the LinkedIn account with a user record in your database,
+      // and return that user instead (so perform a knex query here later.)
+      return done(null, profile);
+}));
+
+//mount auth.js middleware
+app.use('/auth', auth);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -56,5 +99,8 @@ app.use(function(err, req, res, next) {
   });
 });
 
+var server = app.listen(port, function(){
+  console.log ("Listening on " + port)
+});
 
 module.exports = app;
