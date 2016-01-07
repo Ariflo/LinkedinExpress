@@ -51,8 +51,8 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(obj, done) {
-  //here is where you will go to the database and get the user each time from it's id, after you set up your db
-  done(null, obj);
+  //here is where you will go to the database and get the user each time from it's id, after you set up your db 
+      done(null, obj);
 });
 
 passport.use(new LinkedInStrategy({
@@ -60,6 +60,7 @@ passport.use(new LinkedInStrategy({
     consumerSecret: process.env['LINKEDIN_KEY'],
     callbackURL: "http://localhost:3000/auth/linkedin/callback",
     scope: ['r_emailaddress', 'r_basicprofile'],
+    state: true
   },
 
   function(token, tokenSecret, profile, done) {
@@ -68,13 +69,13 @@ passport.use(new LinkedInStrategy({
       // represent the logged-in user.  In a typical application, you would want
       // to associate the LinkedIn account with a user record in your database,
       // and return that user instead (so perform a knex query here later.)
-      return done(null, profile);
+        return done(null, {id: profile.id, displayName: profile.displayName});
 }));
 
 // right above app.use('/', routes);
 app.use('/dash', function (req, res, next) {
-  res.locals.user = req.user;
-  next();
+  res.locals.user = req.user
+  next()
 });
 
 //mount auth.js middleware
