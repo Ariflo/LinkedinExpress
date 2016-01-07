@@ -2,8 +2,10 @@ var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
+var locus = require('locus');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var knex = require ("./db/knex");
 var passport = require('passport');
 var cookieSession = require('cookie-session');
 var LinkedInStrategy = require('passport-linkedin').Strategy;
@@ -14,6 +16,7 @@ var port = process.env.PORT || 3000;
 
 var routes = require('./routes/index');
 var auth = require('./routes/auth');
+var dash = require('./routes/dash');
 
 var app = express();
 
@@ -37,7 +40,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 passport.serializeUser(function(user, done) {
   //later this will be where you selectively store an identifier for your user, like their primary key from the database
-  done(null, user);
+  if (user){
+    var username = user.displayName;
+    var id = user.id;
+  }
+  knex('users').insert({linkin_id: id, name: username}).then(function(){
+        done(null, user);
+  });
+  
 });
 
 passport.deserializeUser(function(obj, done) {
@@ -61,10 +71,17 @@ passport.use(new LinkedInStrategy({
       return done(null, profile);
 }));
 
+// right above app.use('/', routes);
+app.use('/dash', function (req, res, next) {
+  res.locals.user = req.user;
+  next();
+});
 
 //mount auth.js middleware
 app.use('/', routes);
 app.use('/auth', auth);
+app.use('/dash', dash);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
